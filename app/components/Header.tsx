@@ -1,7 +1,7 @@
 import React from "react";
 // import Search from "./Search";
 
-import { SignIn, UserButton } from "@clerk/nextjs";
+import { SignIn, SignUp, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import CartButtonWithData from "./CartbuttonwithData";
 
@@ -18,8 +18,13 @@ function Header() {
         </Link>
       </div>
 
-      <div>
+      <div className="flex gap-4 ">
+        <div className=" bg-black h-5 w-5">
         <SignIn/>
+        </div>
+        <div className=" bg-black h-5 w-5">
+        <SignUp/>
+        </div>
       </div>
       <div>
         <CartButtonWithData />

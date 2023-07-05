@@ -110,4 +110,4 @@ export async function DELETE(req: NextRequest) {
         console.log("error : ", (error as { message: string }).message)
         return NextResponse.json({ error })
     }
-  }
+} 

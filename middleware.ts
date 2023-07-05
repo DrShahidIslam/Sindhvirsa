@@ -5,9 +5,5 @@ export default authMiddleware({
 });
 
 export const config = {
-  runtime: {
-    segment: {
       matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"]
     }
-  }
-};
