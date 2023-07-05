@@ -1,19 +1,32 @@
-import { ClerkProvider, SignIn, SignInButton } from '@clerk/nextjs';
-import './globals.css';
+import { ClerkProvider, SignIn, SignInButton } from "@clerk/nextjs";
+import "./globals.css";
+import Header from "./components/Header";
+import { NavigationMenuDemo } from "./components/Categories";
 
 export const metadata = {
-  title: 'Sindhvirsa',
-  description: 'Culture Redefined',
+  title: "Sindhvirsa",
+  description: "Culture Redefined",
 };
 
-
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <ClerkProvider>
-      <html lang="en">      
-        <body>{children}</body>
+    
+      <html lang="en">
+        <ClerkProvider>
+        <body>
+        
+          <Header />
+          <NavigationMenuDemo />
+          
+          {children}
+          
+        </body>
+        </ClerkProvider>
       </html>
-    </ClerkProvider>
+    
   );
 }

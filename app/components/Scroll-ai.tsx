@@ -1,9 +1,35 @@
-import ImageScroller from '../components/ui/my_scroll';
+import ImageScroller from "../components/ui/my_scroll";
+import React from "react";
+import { client } from "@/lib/sanityClient";
+import { Image as IImage } from "sanity";
+import { urlForImage } from "@/sanity/lib/image";
 
-const images = ['/Shirts.jpg', '/Party.png'];
+export const getCategoryData = async () => {
+  const res = await client.fetch(`*[_type=="category" && image != null] {
+      name,
+      description,
+      _id,
+      image
+  }`);
+  return res;
+};
 
-const MyApp = () => {
-  return <ImageScroller images={images} />;
+interface Icategory {
+  name: string;
+  description: string;
+  image: IImage;
+}
+
+const MyApp = async () => {
+  const data: Icategory[] = await getCategoryData();
+  const allImages = data.flatMap(item =>
+    item.image ? [{ url: urlForImage(item.image).url(), name: item.name }] : []
+  );
+  return (
+    <div>
+      <ImageScroller images={allImages} />
+    </div>
+  );
 };
 
 export default MyApp;

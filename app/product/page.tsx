@@ -21,28 +21,26 @@ export const getProductData = async () => {
   return res;
 };
 
-interface Iprdoduct {
-  id: number;
-  name: string;
-  description: string;
+export type Iproduct = {
+  id?: number;
+  name?: string;
+  description?: string;
   image: IImage;
-  slug: string;
-  price: number;
-  category: {
-    name: string;
-    description: string;
+  slug?: string;
+  price?: number;
+  category?: {
+    name?: string;
+    description?: string;
   };
-}
+};
 
-const Cards = async () => {
-  const data: Iprdoduct[] = await getProductData();
+const Products = async () => {
+  const data: Iproduct[] = await getProductData();
   return (
-    <div className="m-4 mb-24 flex flex-wrap gap-6 justify-center">
+    <div className="max-w-auto mb-24 flex flex-wrap gap-6 justify-center">
       {data.map((item) => (
         <Link key={item.id} href={`/product/${item.id}`}>
-          <div
-            className="flex basis-1 w-auto outline-2 transition-all duration-300 hover:opacity-100 mt-16 h-auto font-normal"
-          >
+          <div className="flex basis-1 w-auto outline-2 transition-all duration-300 hover:opacity-100 mt-16 h-auto font-normal">
             <div className="w-96 h-96 shadow-md mt-10 font-medium">
             <div>
             <Image
@@ -63,4 +61,4 @@ const Cards = async () => {
   );
 };
 
-export default Cards;
+export default Products;
