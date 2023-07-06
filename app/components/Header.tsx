@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { SignIn, SignUp, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignInButton, SignedOut, SignUpButton, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import Cartstate from "./Cartbutton";
 import ContextWrapper from "@/global/context/page";
@@ -31,17 +31,25 @@ function Header() {
         </div>
 
         <div className="flex gap-4 ">
-          <div>
-            <SignIn />
-          </div>
-          <div>
-            <SignUp />
-          </div>
-          <div>
+        <SignedIn>
+          <div className="">
             <UserButton />
           </div>
-        </div>
-        <div className="border flex items-center bg-white text-gray-600 pl-3 rounded-md">
+        </SignedIn>
+        <SignedOut>
+          <div className="">
+            <SignInButton>
+              <button className="rounded border border-gray-300 py-2 px-4 ">Sign In</button>
+            </SignInButton>
+          </div>
+          <div className="">
+            <SignUpButton>
+              <button className="rounded border border-gray-300 py-2 px-4 ">Sign Up</button>
+            </SignUpButton>
+          </div>
+        </SignedOut>
+      </div>
+      <div className="border flex items-center bg-white text-gray-600 pl-3 rounded-md">
           <Link href={`/search/${searchQuery}`}>
             <Search />
           </Link>
