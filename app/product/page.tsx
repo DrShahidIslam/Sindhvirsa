@@ -22,12 +22,14 @@ export const getProductData = async () => {
 };
 
 export type Iproduct = {
-  id?: number;
-  name?: string;
+  id?: number | string;
+  name: string;
+  quantity?: number;
+  productTypes?: Array<string>;
   description?: string;
   image: IImage;
-  slug?: string;
-  price?: number;
+  slug: string | any;
+  price: number;
   category?: {
     name?: string;
     description?: string;

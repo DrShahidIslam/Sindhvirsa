@@ -1,112 +1,234 @@
-// import React, { useRef } from 'react';
-// import Link from 'next/link';
-// import { AiOutlineMinus, AiOutlinePlus, AiOutlineLeft, AiOutlineShopping } from 'react-icons/ai';
-// import { TiDeleteOutline } from 'react-icons/ti';
-// import toast from 'react-hot-toast';
+"use client"
+import { Iproduct } from "../product/page" 
+import { cartContext } from "@/global/context/page"
+import Image from "next/image"
+import { useContext, useEffect, useState } from "react"
+import { Trash } from "lucide-react";
+import toast, { Toaster } from "react-hot-toast"
+import { useRouter } from "next/navigation"
+import { urlFor } from "@/lib/sanityClient"
+import LoadingComp from "../components/LoadingComp"
 
-// import { useStateContext } from '../context/StateContext';
-// import { urlFor } from '../lib/client';
-// import getStripe from '../lib/getStripe';
 
-// const Cart = () => {
-//   const cartRef = useRef();
-//   const { totalPrice, totalQuantities, cartItems, setShowCart, toggleCartItemQuanitity, onRemove } = useStateContext();
+const notificationError = (title: string) => {
+    toast(title, {
+        position: "top-center"
+    })
+};
 
-//   const handleCheckout = async () => {
-//     const stripe = await getStripe();
+const CartComp = ({ allProductsOfStore }: { allProductsOfStore: Array<Iproduct> }) => {
+    const [loadings, setLoadings] = useState<boolean>(false);
+    const [allProductsForCart, setAllProductsForCart] = useState<any>();
+    let { userData, cartArray, dispatch, loading, setLoading } = useContext(cartContext)
+    const [totalPrice, setTotalPrice] = useState(0);
+    let router = useRouter();
 
-//     const response = await fetch('/api/stripe', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify(cartItems),
-//     });
+    function PriceSubTotal() {
+        let orignalToSend: number = 0;
+        allProductsForCart && allProductsForCart.forEach((element: Iproduct) => {
+            let subTotalPrice = element.quantity as number * element.price;
+            orignalToSend = orignalToSend + subTotalPrice;
+        });
+        if (orignalToSend !== 0) {
+            setTotalPrice(orignalToSend);
+            router.refresh();
+        }
+    }
 
-//     if(response.statusCode === 500) return;
-    
-//     const data = await response.json();
 
-//     toast.loading('Redirecting...');
+    useEffect(() => {
+        PriceSubTotal();
+    }, [allProductsForCart])
 
-//     stripe.redirectToCheckout({ sessionId: data.id });
-//   }
 
-//   return (
-//     <div className="cart-wrapper" ref={cartRef}>
-//       <div className="cart-container">
-//         <button
-//         type="button"
-//         className="cart-heading"
-//         onClick={() => setShowCart(false)}>
-//           <AiOutlineLeft />
-//           <span className="heading">Your Cart</span>
-//           <span className="cart-num-items">({totalQuantities} items)</span>
-//         </button>
+    function handleRemove(product_id: number) {
+        if (userData) {
+            let user_id = userData.uuid;
+            dispatch("removeFromCart", { product_id, user_id });
+        }
+    }
+    useEffect(() => {
+        if (cartArray) {
+            let data = allProductsOfStore.filter((item: Iproduct) => {
+                for (let index = 0; index < cartArray.length; index++) {
+                    let element: any = cartArray[index];
+                    if (element.product_id === item.id && element.user_id === userData.uuid) {
+                        return true
+                    };
+                };
+            });
+            let updatedData = data.map((elem: Iproduct) => {
+                for (let index = 0; index < cartArray.length; index++) {
+                    let element: any = cartArray[index];
+                    if (element.product_id === elem.id) {
+                        return {
+                            ...elem,
+                            quantity: element.quantity,
+                        }
+                    };
+                };
+            })
+            setAllProductsForCart(updatedData);
+        }
 
-//         {cartItems.length < 1 && (
-//           <div className="empty-cart">
-//             <AiOutlineShopping size={150} />
-//             <h3>Your shopping bag is empty</h3>
-//             <Link href="/">
-//               <button
-//                 type="button"
-//                 onClick={() => setShowCart(false)}
-//                 className="btn"
-//               >
-//                 Continue Shopping
-//               </button>
-//             </Link>
-//           </div>
-//         )}
+    }, [cartArray]);
 
-//         <div className="product-container">
-//           {cartItems.length >= 1 && cartItems.map((item) => (
-//             <div className="product" key={item._id}>
-//               <img src={urlFor(item?.image[0])} className="cart-product-image" />
-//               <div className="item-desc">
-//                 <div className="flex top">
-//                   <h5>{item.name}</h5>
-//                   <h4>${item.price}</h4>
-//                 </div>
-//                 <div className="flex bottom">
-//                   <div>
-//                   <p className="quantity-desc">
-//                     <span className="minus" onClick={() => toggleCartItemQuanitity(item._id, 'dec') }>
-//                     <AiOutlineMinus />
-//                     </span>
-//                     <span className="num" onClick="">{item.quantity}</span>
-//                     <span className="plus" onClick={() => toggleCartItemQuanitity(item._id, 'inc') }><AiOutlinePlus /></span>
-//                   </p>
-//                   </div>
-//                   <button
-//                     type="button"
-//                     className="remove-item"
-//                     onClick={() => onRemove(item)}
-//                   >
-//                     <TiDeleteOutline />
-//                   </button>
-//                 </div>
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//         {cartItems.length >= 1 && (
-//           <div className="cart-bottom">
-//             <div className="total">
-//               <h3>Subtotal:</h3>
-//               <h3>${totalPrice}</h3>
-//             </div>
-//             <div className="btn-container">
-//               <button type="button" className="btn" onClick={handleCheckout}>
-//                 Pay with Stripe
-//               </button>
-//             </div>
-//           </div>
-//         )}
-//       </div>
-//     </div>
-//   )
-// }
+    async function handleDecrementByOne(product_id: string, price: any) {
+        let stableQuantity: number = 0;
+        cartArray.forEach((element: any) => {
+            if (element.product_id == product_id) {
+                stableQuantity = element.quantity
+            }
+        });
 
-// export default Cart
+        if (stableQuantity - 1 <= 0) {
+            notificationError("Did not accept lower than 1")
+        } else {
+            await dispatch("updateCart", {
+                product_id: product_id,
+                quantity: stableQuantity - 1,
+                user_id: userData.uuid,
+                price: price,
+            });
+            notificationError("Decremented by One")
+        }
+    }
+    async function handleIncrementByOne(product_id: string, price: any) {
+        let stableQuantity: number = 0;
+        cartArray.forEach((element: any) => {
+            if (element.product_id == product_id) {
+                stableQuantity = element.quantity
+            }
+        });
+        let returnedVal = await dispatch("updateCart", {
+            product_id: product_id,
+            quantity: stableQuantity + 1,
+            user_id: userData.uuid,
+            price: price,
+        });
+        notificationError("Incremented by One");
+    }
+
+    async function handleProcessCheckout() {
+        setLoadings(true);
+        let linkOrg: any = await fetch(`/api/checkout_sessions`, {
+            method: "POST",
+            body: JSON.stringify(allProductsForCart)
+        })
+        if (linkOrg) {
+            let { link } = await linkOrg.json()
+            window.location.href = link
+        }
+        setLoadings(false);
+    }
+
+    return (
+        <div className="py-10 px-4 md:px-10">
+            <Toaster />
+
+            {/* first */}
+            <div className="py-6">
+                <h1 className="text-2xl font-semibold text-gray-900">Shopping Cart</h1>
+            </div>
+
+
+            {/* second */}
+            <div className="flex flex-col lg:flex-row gap-6">
+
+
+                <div className="flex flex-col basis-[69%] gap-4">
+
+                    {allProductsForCart ? allProductsForCart.map((item: Iproduct, index: number) => {
+                        return (
+                            <div key={index} className=" flex flex-shrink-0 gap-6">
+                                <div className="w-[14rem]">
+                                    <Image className="rounded-xl" width={1000} height={1000} src={urlFor(item.image).width(1000).height(1000).url()} alt='sindhvirsa' />
+                                </div>
+                                <div className="space-y-1 md:space-y-3 w-full">
+                                    <div className="flex justify-between">
+                                        <h2 className="md:text-2xl font-light text-gray-700">{item.name}</h2>
+                                        {loading ? <LoadingComp size={"w-10"} /> :
+                                            <div className="cursor-pointer" onClick={() => handleRemove(item.id as number)}>
+                                                <Trash size={28} />
+                                            </div>
+                                        }
+                                    </div>
+
+                                        <div className="flex justify-between">
+                                        <p className="font-semibold md:text-lg">{"$"}{item.price}</p>
+                                        <div className={`flex gap-2 ${loading ? "opacity-25" : "opacity-100"} items-center text-lg`}>
+                                            <button
+                                                onClick={() => handleDecrementByOne(item.id as string, item.price)}
+                                                className="select-none cursor-pointer flex justify-center items-center w-8 h-8 rounded-full bg-gray-200">
+                                                -
+                                            </button>
+                                            <p>{item.quantity}</p>
+                                            <button
+                                                onClick={() => handleIncrementByOne(item.id as string, item.price)}
+                                                disabled={loading}
+                                                className="border select-none cursor-pointer flex justify-center items-center w-8 h-8 rounded-full  border-gray-800"
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    }) :
+                        !userData ? (
+                            <div className="text-center font-semibold text-gray-800 text-xl">Please login First</div>
+                        ) :
+                            arrayForLoading.map((index: number) => (
+                                <div key={index} className="border border-blue-300 shadow rounded-md p-4 w-full mx-auto">
+                                    <div className="flex animate-pulse gap-4">
+                                        <div className="bg-slate-200 rounded-lg h-32 w-4/12"></div>
+                                        <div className="flex-1 space-y-6 py-1">
+                                            <div className="grid grid-cols-3 gap-4">
+                                                <div className="h-2 bg-slate-200 rounded col-span-2"></div>
+                                                <div className="h-2 bg-slate-200 rounded col-span-1"></div>
+                                            </div>
+                                            <div className="space-y-3">
+                                                <div className="h-2 bg-slate-200 rounded"></div>
+                                                <div className="h-2 bg-slate-200 rounded"></div>
+                                            </div>
+                                            <div className="h-8 w-16 bg-slate-200 rounded"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                    }
+                </div>
+
+
+
+                <div className="basis-1/4 space-y-6 px-6">
+                    <h6 className="font-semibold text-xl">Order Summary</h6>
+                    <div className="flex justify-between">
+                        <p className="text-lg font-light">Quantity:</p>
+                        <p>{cartArray.length} Products</p>
+                    </div>
+                    <div className="flex justify-between">
+                        <p className="text-lg font-light">Subtotal:</p>
+                        <p>${totalPrice}</p>
+                    </div>
+                    <button
+                        onClick={handleProcessCheckout}
+                        className="text-white bg-gray-900 border border-gray-500 px-4 py-2 w-full">
+                        {loadings ? "Loading..." :
+                            "Process to Checkout"
+                        }
+                    </button>
+                </div>
+
+            </div>
+
+
+        </div>
+    )
+}
+
+export default CartComp
+
+
+let arrayForLoading = [1, 2, 3, 4]

@@ -1,10 +1,8 @@
 "use client"
 import { ReactNode, createContext, useEffect, useReducer, useState } from "react";
-
-
-import { GoogleAuthProvider, createUserWithEmailAndPassword, onAuthStateChanged, sendEmailVerification, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile } from "firebase/auth";
+import { cartReducer } from "../reducer/page";
 import { useRouter } from "next/navigation";
-
+import BASE_PATH_FORAPI from "@/app/components/Basepath"; 
 
 export const cartContext = createContext<any>(null);
 
@@ -16,13 +14,9 @@ interface indexForError {
 const ContextWrapper = ({ children }: { children: ReactNode }) => {
     let router = useRouter();
     const [userData, setUserData] = useState<any>();
-    const [errorViaUserCredential, setErrorViaUserCredential] = useState<indexForError | "">("")
+    
     const [loading, setLoading] = useState(false);
     const [cartArray, setCartArray] = useState<any>([]);
-    const [errorsOfFirebase, setErrorsOfFirebase] = useState({
-        key: "",
-        errorMessage: "",
-    });
     const [quantity, setQuantity] = useState(0);
 
     useEffect(() => {
@@ -80,4 +74,20 @@ const ContextWrapper = ({ children }: { children: ReactNode }) => {
         } else {
             return "unSucess"
         }
-    };
+    }
+
+
+    return (
+        <cartContext.Provider value={{
+            cartArray,
+            dispatch,
+            userData,
+            loading,
+            quantity,
+            setQuantity,
+        }}>
+            {children}
+        </cartContext.Provider>
+    )
+    }
+export default ContextWrapper
