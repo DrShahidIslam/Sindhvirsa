@@ -13,6 +13,7 @@ async function fatchAllStoreProducts() {
 
 const Cart = async () => {
   let allProductsOfStore = await fatchAllStoreProducts();
+  
   return (
     <ContextWrapper>
       <CartComp allProductsOfStore={allProductsOfStore.result} />

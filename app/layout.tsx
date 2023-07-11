@@ -2,6 +2,7 @@ import { ClerkProvider, SignIn, SignInButton } from "@clerk/nextjs";
 import "./globals.css";
 import Header from "./components/Header";
 import { NavigationMenuDemo } from "./components/Categories";
+import ContextWrapper from "@/global/context/page";
 
 export const metadata = {
   title: "Sindhvirsa",
@@ -17,6 +18,7 @@ export default function RootLayout({
     
       <html lang="en">
         <ClerkProvider>
+          <ContextWrapper>
         <body>
         
           <Header />
@@ -25,6 +27,7 @@ export default function RootLayout({
           {children}
           
         </body>
+        </ContextWrapper>
         </ClerkProvider>
       </html>
     
