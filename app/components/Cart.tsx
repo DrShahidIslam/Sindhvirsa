@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
 import { Trash } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
-import { useRouter } from "next/navigation";
 import { urlFor } from "@/lib/sanityClient";
 import LoadingComp from "../components/LoadingComp";
 import { useUser } from "@clerk/nextjs";
@@ -22,12 +21,10 @@ const CartComp = ({
 }: {
   allProductsOfStore: Array<Iproduct>;
 }) => {
-  const [loadings, setLoadings] = useState<boolean>(false);
   const [allProductsForCart, setAllProductsForCart] = useState<any>();
-  let { userData, quantity, cartArray, dispatch, loading, setLoading } =
+  let { state, userData, apidispatch, quantity, loading, setQuantity } =
     useContext(cartContext);
   const [totalPrice, setTotalPrice] = useState(0);
-  let router = useRouter();
   const { user } = useUser();
 
   function PriceSubTotal() {
@@ -49,14 +46,23 @@ const CartComp = ({
   function handleRemove(product_id: number) {
     if (userData) {
       let user_id = user?.fullName;
-      dispatch("removeFromCart", { product_id, user_id });
+      apidispatch("removeFromCart", { product_id, user_id });
+  
+      // Find the removed product in the cart array
+      let removedProduct = state.cartArray.find((elem: any) => elem.product_id === product_id);
+  
+      // Update the quantity state by subtracting the quantity of the removed product
+      if (removedProduct) {
+
+        setQuantity(quantity - removedProduct.quantity);
+      }
     }
   }
   useEffect(() => {
-    if (cartArray) {
+    if (state.cartArray) {
       let data = allProductsOfStore.filter((item: Iproduct) => {
-        for (let index = 0; index < cartArray.length; index++) {
-          let element: any = cartArray[index];
+        for (let index = 0; index < state.cartArray.length; index++) {
+          let element: any = state.cartArray[index];
           if (
             element.product_id == item.id &&
             element.user_id == user?.fullName
@@ -67,8 +73,8 @@ const CartComp = ({
       });
 
       let updatedData = data.map((elem: Iproduct) => {
-        for (let index = 0; index < cartArray.length; index++) {
-          let element: any = cartArray[index];
+        for (let index = 0; index < state.cartArray.length; index++) {
+          let element: any = state.cartArray[index];
           if (element.product_id == elem.id) {
             return {
               ...elem,
@@ -80,44 +86,46 @@ const CartComp = ({
 
       setAllProductsForCart(updatedData);
     }
-  }, [cartArray]);
+  }, [state.cartArray]);
 
   async function handleDecrementByOne(product_id: number, price: number) {
     let stableQuantity: number = 0;
-    cartArray.forEach((element: any) => {
+    state.cartArray.forEach((element: any) => {
       if (element.product_id == product_id) {
         stableQuantity = element.quantity;
       }
     });
-
+  
     if (stableQuantity - 1 <= 0) {
       notificationError("Did not accept lower than 1");
     } else {
-      await dispatch("updateCart", {
+      await apidispatch("updateCart", {
         product_id: product_id,
         quantity: stableQuantity - 1,
         user_id: user?.fullName,
         price: price,
       });
       notificationError("Decremented by One");
+      setQuantity(quantity - 1);
     }
   }
+  
   async function handleIncrementByOne(product_id: number, price: number) {
     let stableQuantity: number = 0;
-    cartArray.forEach((element: any) => {
+    state.cartArray.forEach((element: any) => {
       if (element.product_id == product_id) {
         stableQuantity = element.quantity;
       }
     });
-    let returnedVal = await dispatch("updateCart", {
+    let returnedVal = await apidispatch("updateCart", {
       product_id: product_id,
       quantity: stableQuantity + 1,
       user_id: user?.fullName,
       price: price,
     });
     notificationError("Incremented by One");
+    setQuantity(quantity + 1);
   }
-
   const handleProcessCheckout = async () => {
     const stripe = await getStripePromise();
     const response = await fetch("/api/checkout_sessions/", {
@@ -131,6 +139,7 @@ const CartComp = ({
       stripe?.redirectToCheckout({ sessionId: data.session.id });
     }
   };
+  
   return (
     <div className="py-10 px-4 md:px-10">
       <Toaster />
@@ -164,7 +173,7 @@ const CartComp = ({
                       ) : (
                         <div
                           className="cursor-pointer"
-                          onClick={() => handleRemove(item.id as number)}
+                          onClick={() => handleRemove(item.id)}
                         >
                           <Trash size={28} />
                         </div>

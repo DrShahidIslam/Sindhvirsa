@@ -6,10 +6,9 @@ import Cart from "./Cartbutton";
 import ContextWrapper from "@/global/context/page";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
-import { cartContext } from "@/global/context/page";
+
 
 function Header() {
-  const{quantity} = useContext(cartContext)
   const router = useRouter();
   const User = <UserButton afterSignOutUrl="/" />;
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,7 +20,6 @@ function Header() {
   }
 
   return (
-    <ContextWrapper>
   <div className="flex flex-col md:flex-row justify-between mx-4 md:mx-16 my-3 gap-6">
     <div>
       <Link
@@ -71,7 +69,6 @@ function Header() {
       <Cart/>
     </Link>
   </div>
-</ContextWrapper>
   );
 }
 

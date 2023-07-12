@@ -12,34 +12,34 @@ import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 
 const ProductDetail: FC<{ item: Iproduct }> = ({ item }) => {
-  let { cartArray, userData, dispatch, quantity, setQuantity } = useContext(cartContext);
+  let { state, userData, apidispatch, quantity, setQuantity } = useContext(cartContext);
   const [localQuantity, setLocalQuantity] = useState(1);
   const { user } = useUser();
+
   function handleAddToCart() {
-    let isExsits = cartArray.some((elem: any) => elem.product_id === item.id);
-  
-    if (userData) {
-      let dataToAddInCart = {
-        product_id: item.id,
-        quantity: localQuantity,
-        user_id: user?.fullName,
-        price: item.price,
-      };
-      
-      if (!isExsits) {
-        dispatch("addToCart", dataToAddInCart);
-        setQuantity(quantity + localQuantity);
-      } else {
-        dispatch("updateCart", dataToAddInCart);
-        let existingProduct = cartArray.find((elem: any) => elem.product_id === item.id);
-        setQuantity(quantity - existingProduct.quantity + localQuantity);
-      }
-      notification(item.name);
+  let isExsits = state.cartArray.some((elem: any) => elem.product_id === item.id);
+
+  if (userData) {
+    let dataToAddInCart = {
+      product_id: item.id,
+      quantity: localQuantity,
+      user_id: user?.fullName,
+      price: item.price,
+    };
+    
+    if (!isExsits) {
+      apidispatch("addToCart", dataToAddInCart);
+      setQuantity(quantity + localQuantity);
     } else {
-      notificationError("Please login first");
+      apidispatch("updateCart", dataToAddInCart);
+      let existingProduct = state.cartArray.find((elem: any) => elem.product_id === item.id);
+      setQuantity(quantity - existingProduct.quantity + localQuantity);
     }
+    notification(item.name);
+  } else {
+    notificationError("Please login first");
   }
-   
+}
 
   function incrementTheQuantity() {
     setLocalQuantity(localQuantity + 1);

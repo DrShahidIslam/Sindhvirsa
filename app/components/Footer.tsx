@@ -1,8 +1,10 @@
+"use client"
 import Image from "next/image";
 import React from "react";
 import logo from "../../public/sindhvirsa logo transparent.png"
 
 const Footer = () => {
+ 
   return (
     <div className="bg-black h-50 flex justify-around">
               <div>

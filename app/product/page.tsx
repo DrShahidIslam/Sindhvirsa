@@ -22,7 +22,7 @@ export const getProductData = async () => {
 };
 
 export type Iproduct = {
-  id?: number | string;
+  id: number;
   name: string;
   quantity: number;
   productTypes?: Array<string>;

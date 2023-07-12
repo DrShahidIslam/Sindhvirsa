@@ -1,8 +1,8 @@
 import { sql } from "@vercel/postgres";
 import { drizzle } from "drizzle-orm/vercel-postgres";
-import * as schema from "./schema"; 
+import {cartTable, Cart} from "./schema";
 
 
-export const db  = drizzle<typeof schema>(sql);
+export const db  = drizzle<Cart>(sql);
 
 export { drizzle };

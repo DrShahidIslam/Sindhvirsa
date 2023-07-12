@@ -45,10 +45,10 @@
 //   } catch (error) {}
 // };
 
-import { cartTable, db, drizzle} from "@/lib/drizzle";
+import {db} from "@/lib/drizzle";
 import { NextRequest, NextResponse } from "next/server";
 import { and, eq } from "drizzle-orm";
-import { NextApiRequest, NextApiResponse } from "next";
+import { cartTable } from "@/lib/schema";
 
 export async function GET(req: NextRequest) {
   let url = req.nextUrl.searchParams;
@@ -125,12 +125,4 @@ export async function DELETE(req: NextRequest) {
     console.log("error : ", (error as { message: string }).message);
     return NextResponse.json({ error });
   }
-}
-
-async function getTotalQuantity(userId: any) {
-  const result = await db.query(
-    `SELECT SUM(quantity) as totalQuantity FROM cart WHERE user_id = $1`,
-    [userId]
-  );
-  return result.rows[0].totalQuantity;
 }
