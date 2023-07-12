@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { client } from "@/lib/sanityClient";
 import { Image as IImage } from "sanity";
 import Link from "next/link";
@@ -34,8 +35,16 @@ interface Iprdoduct {
   };
 }
 
-const Cards = async () => {
-  const data: Iprdoduct[] = await getProductData();
+const Cards = () => {
+  const [data, setData] = useState<Iprdoduct[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const products = await getProductData();
+      setData(products);
+    };
+    fetchData();
+  }, []);
   return (
     <div className="m-4 mb-24 flex flex-wrap gap-6 justify-center">
       {data.map((item) => (
