@@ -1,4 +1,4 @@
-This is an ecommerce project using latest state of the art technologies. You can visit here:
+This is an ecommerce project developed for Sindhvirsa, A clothing store. You can visit here:
 
 https://sindhvirsa-shahid-cool88-yahoocom.vercel.app
 
@@ -14,7 +14,5 @@ Connected Stripe APIs to power online payment processing for e-commerce.
 Used React-hot-toast library to adds beautiful notifications.
 
 Used Icons from Lucid (default from Shadcn-UI).
-
-Stripe Test Credit Cards.
 
 Clerk for Auth/User Management.
